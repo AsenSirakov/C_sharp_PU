@@ -1,6 +1,0 @@
-@Project_university_movie_store_HostAddress = http://localhost:5244
-
-GET {{Project_university_movie_store_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

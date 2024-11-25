@@ -1,5 +1,10 @@
+using Mapster;
+using MovieStore.BL;
+using MovieStore.BL.Interfaces;
+using MovieStore.BL.Services;
+using MovieStore.MapsterConfig;
 
-namespace Movie_store_uni
+namespace MovieStore
 {
     public class Program
     {
@@ -8,15 +13,23 @@ namespace Movie_store_uni
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services
+                .RegisterDataLayer()
+                .RegisterBusinessLayer();
+        
+            builder.Services.AddMapster();
 
+            MapsterConfiguration.Configure();
+                
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -26,7 +39,6 @@ namespace Movie_store_uni
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

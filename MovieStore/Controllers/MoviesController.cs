@@ -12,9 +12,11 @@ namespace MovieStore.Controllers
     {
         private readonly IMovieService _movieService;
         private readonly IMapper _mapper;
+        private readonly ILogger<MoviesController> logger;
 
         public MoviesController(IMovieService movieService, IMapper mapper)
         {
+            ILogger<MoviesController> logger;
             _movieService = movieService;
             _mapper = mapper;
         }

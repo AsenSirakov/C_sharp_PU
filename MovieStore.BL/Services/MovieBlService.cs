@@ -15,18 +15,17 @@ namespace MovieStore.BL.Services
         private readonly IMovieService movieService;
         private readonly IActorRepository actorRepository;
 
-        public MovieBlService
         public IEnumerable<MoviesView> GetDetailedMovies()
         {
-            var result 
-            var movies:List < Movie > = movieService.GetAllMovies();
+            var result = new List<MoviesView>();
+            List<Movie> movies = movieService.GetAllMovies();
 
             foreach (var movie in movies)
             {
-                var actors = new List<Actor>
-                var movieView = new MoviesView
+                var actors = new List<Actor>();
+                var movieView = new MoviesView()
                 {
-                    Id = movie.Id,
+                    Id = movies.Id,
                     Title = movie.Title,
                     Year = movie.Year,
                     Actors = new List<Actor>(capacity: movie.Actors.Count())
@@ -34,6 +33,7 @@ namespace MovieStore.BL.Services
                 
              
             }
+            return result;
         }
     }
 }

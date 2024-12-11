@@ -13,15 +13,17 @@ namespace MovieStore.DL.Repositories
 
         public void AddMovie(Movie movie)
         {
+            if (movie == null) return;
+            movie.Id = Guid.NewGuid().ToString();
             InMemoryDb.Movies.Add(movie);
         }
 
-        public Movie? GetMovieById(int id)
+        public Movie? GetMovieById(string id)
         {
             return InMemoryDb.Movies.FirstOrDefault(m => m.Id == id);
         }
 
-        public void DeleteMovie(int id)
+        public void DeleteMovie(string id)
         {
             var movie = InMemoryDb.Movies.FirstOrDefault(m => m.Id == id);
 

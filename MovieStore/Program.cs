@@ -2,6 +2,7 @@ using System.Diagnostics.Eventing.Reader;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Mapster;
+using MongoDB.Driver;
 using MovieStore.BL;
 using MovieStore.BL.Interfaces;
 using MovieStore.BL.Services;
@@ -40,6 +41,7 @@ namespace MovieStore
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddHealthChecks();
 
 
             var app = builder.Build();
@@ -52,6 +54,7 @@ namespace MovieStore
                 app.UseSwaggerUI();
             }
 
+            app.MapHealthChecks("/healthz");
             app.UseHttpsRedirection();
 
             app.UseAuthorization();

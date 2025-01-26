@@ -1,10 +1,11 @@
-using MovieStore.Models.DTO;
+﻿using MovieStore.Models.DTO;
 
-namespace MovieStore.DL.Interfaces;
-
-public interface IActorRepository
+namespace MovieStore.DL.Interfaces
 {
-    Actor? GetActorById(string actorId);
-    List<Actor> GetActorsById(IEnumerable<string> actorIds);
-    void AddActorToMovie(string actorId, Movie movie);
+    public interface IActorRepository
+    {
+        void AddActor(Actor actor);
+        IEnumerable<Actor> GetActorsByIds(IEnumerable<string> actorsIds);
+        Actor? GetById(string id);
+    }
 }

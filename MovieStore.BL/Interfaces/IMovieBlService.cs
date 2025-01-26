@@ -1,14 +1,9 @@
-﻿using MovieStore.Models.View;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MovieStore.Models.Views;
 
 namespace MovieStore.BL.Interfaces
 {
     public interface IMovieBlService
     {
-        public IEnumerable<MoviesView> GetDetailedMovies();
+        List<MovieView> GetDetailedMovies();
     }
 }

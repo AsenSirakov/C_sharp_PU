@@ -1,46 +1,59 @@
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using MovieStore.BL.Interfaces;
-using MovieStore.Models.DTO;
+using MovieStore.Models.Responses;
+using MovieStore.Models.View;
 
 namespace MovieStore.Controllers
+
 {
     [ApiController]
     [Route("[controller]")]
     public class BusinessController : ControllerBase
     {
-        private readonly IMovieBlService _movieService;
-        private readonly IActorService _actorService;
+        private readonly ILogger<BusinessController> _logger;
+        private readonly IBusinessService _businessService;
+        private readonly IMapper _mapper;
 
-        public BusinessController(IMovieBlService movieService, IActorService actorService)
+        public BusinessController(ILogger<BusinessController> logger, IBusinessService businessService, IMapper mapper)
         {
-            _movieService = movieService;
-            _actorService = actorService;
+            _logger = logger;
+            _businessService = businessService;
+            _mapper = mapper;
         }
 
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpGet("GetAllDetailedMovie")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [HttpGet("GetAllMovieWithDetails")]
-        public IActionResult GetAllMovieWithDetails()
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetDetailedMovieInfo()
         {
-            var result = _movieService.GetDetailedMovies();
-
-            if (result == null || result.Count == 0)
+            var result = await _businessService.GetDetailedMovies();
+            if (!result.Any())
             {
-                return NotFound("No movies found");
+                return NotFound();
             }
 
             return Ok(result);
         }
 
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpGet("AddActorToMovie")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [HttpPost("AddActor")]
-        public IActionResult AddActor([FromBody] Actor actor)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> AddActorToMovie(string actorId, string movieId)
         {
-            _actorService.Add(actor);
+            try
+            {
+                await _businessService.AddActor(movieId, actorId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return BadRequest(ex.Message);
+            }
+            
 
             return Ok();
         }
-
+        
     }
 }

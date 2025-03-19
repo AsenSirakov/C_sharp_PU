@@ -1,8 +1,10 @@
+using System.Diagnostics.Eventing.Reader;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Mapster;
 using MovieStore.BL;
-using MovieStore.HealthChecks;
+using MovieStore.BL.Interfaces;
+using MovieStore.BL.Services;
 using MovieStore.MapsterConfig;
 using MovieStore.ServiceExtensions;
 using MovieStore.Validators;
@@ -16,37 +18,33 @@ namespace MovieStore
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            
+            // Add fluent validation
             var logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
-                .WriteTo.Console(theme:
-                    AnsiConsoleTheme.Code)
+                .WriteTo.Console(theme: AnsiConsoleTheme.Code)
                 .CreateLogger();
-
-            builder.Logging.AddSerilog(logger);
-
+            
             // Add services to the container.
             builder.Services
                 .AddConfigurations(builder.Configuration)
                 .RegisterDataLayer()
-                .RegisterBusinessLayer();
+                .RegisterBusinessLayer()
+                .AddBackgroundServices();
 
             MapsterConfiguration.Configure();
             builder.Services.AddMapster();
 
-
-            builder.Services
-                .AddValidatorsFromAssemblyContaining<AddMovieRequestValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<AddMovieRequestValidator>();
             builder.Services.AddFluentValidationAutoValidation();
-
+                
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            
+            // Health check
+            builder.Services.AddHealthChecks();
 
-            //builder.Services.AddHealthChecks();
-
-            builder.Services.AddHealthChecks()
-                .AddCheck<SampleHealthCheck>("Sample");
 
             var app = builder.Build();
 
@@ -57,8 +55,9 @@ namespace MovieStore
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
-            app.MapHealthChecks("/Sample");
+            
+            // Access it by localhost:port/healthz
+            app.MapHealthChecks("/healthz");
 
             app.UseHttpsRedirection();
 

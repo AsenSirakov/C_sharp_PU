@@ -4,11 +4,11 @@ namespace MovieStore.DL.Interfaces
 {
     public interface IMovieRepository
     {
-        List<Movie> GetAllMovies();
-        void AddMovie(Movie movie);
-        Movie? GetMovieById(string id);
+        Task<List<Movie>> GetAllMovies();
+        Task AddMovie(Movie movie);
 
-        //void UpdateMovie(Movie movie);
-        //void DeleteMovie(int id);
+        Task<Movie?> GetMovieById(string id);
+        Task DeleteMovie(string id);
+        Task UpdateMovie(Movie movie);
     }
 }

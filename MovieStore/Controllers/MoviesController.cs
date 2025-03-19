@@ -1,8 +1,9 @@
+using System.Net;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using MovieStore.BL.Interfaces;
 using MovieStore.Models.DTO;
-using MovieStore.Models.Requests;
+using MovieStore.Models.Request;
 
 namespace MovieStore.Controllers
 {
@@ -14,87 +15,128 @@ namespace MovieStore.Controllers
         private readonly IMapper _mapper;
         private readonly ILogger<MoviesController> _logger;
 
-        public MoviesController(
-            IMovieService movieService,
-            IMapper mapper, 
-            ILogger<MoviesController> logger)
+        public MoviesController(IMovieService movieService, IMapper mapper, ILogger<MoviesController> logger)
         {
             _movieService = movieService;
             _mapper = mapper;
             _logger = logger;
         }
 
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("GetAll")]
-        public IActionResult Get()
-        {
-            var result = _movieService.GetAllMovies();
-
-            if (result == null || result.Count == 0)
-            {
-                return NotFound("No movies found");
-            }
-
-            return Ok(result);
-        }
-
-        [HttpGet("GetById")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult GetById(string id)
+        public async Task<IActionResult> Get()
         {
-            if (string.IsNullOrEmpty(id))
+            var result = await _movieService.GetAllMovies();
+
+            if (result.Count == 0)
             {
-                return BadRequest("Id can't be null or empty");
+                return NotFound();
             }
-
-            var result = _movieService.GetById(id);
-
-            if (result == null)
-            {
-                return NotFound($"Movie with ID:{id} not found");
-            }
-
+            
             return Ok(result);
         }
 
         [HttpPost("Add")]
-        public IActionResult Add(AddMovieRequest movie)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Add(AddMovieRequest movieRequest)
         {
+            var movieDto = _mapper.Map<Movie>(movieRequest);
+
             try
             {
-                var movieDto = _mapper.Map<Movie>(movie);
-
                 if (movieDto == null)
                 {
-                    return BadRequest("Can't convert movie to movie DTO");
+                    return BadRequest("Could not add movie to the database");
                 }
 
-                _movieService.AddMovie(movieDto);
-
-                return Ok();
+                await _movieService.AddMovie(movieDto);
+                return Ok("Movie added successfully.");
             }
             catch (System.Exception ex)
             {
-                _logger.LogError(ex, $"Error adding movie with");
+                _logger.LogError(ex, "Could not add movie to the database");
+                return BadRequest(ex.Message);
+            }
+            
+            
+        }
+
+        [HttpGet("GetMovieById")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult?> GetById(string id)
+        {
+            _logger.LogInformation($"Getting movie by id: {id}");
+            if (id.Length == 0)
+            {
+                _logger.LogError($"Getting movie by id: {id}");
+                return BadRequest("Id is invalid, must be greater than zero.");
+            }
+            var result = await _movieService.GetMovieById(id);
+
+            if (result == null)
+            {
+                return NotFound($"Movie with {id} not found.");
+            }
+
+            return Ok(result);
+        }
+
+        [HttpDelete("Delete")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Delete(string id)
+        {
+            if (id.Length == 0)
+            {
+                return BadRequest("Id is invalid, must be greater than zero.");
+            }
+            await _movieService.DeleteMovie(id);
+            return Ok("Movie deleted.");
+        }
+
+        [HttpPut("Update")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Update(UpdateMovieRequest movieRequest)
+        {
+            var movieDto = _mapper.Map<Movie>(movieRequest);
+            try
+            {
+                if (movieDto == null)
+                {
+                    return BadRequest("Could not update movie to the database");
+                }
+
+                await _movieService.UpdateMovie(movieDto);
+                return Ok("Movie updated successfully.");
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Could not update movie to the database");
                 return BadRequest(ex.Message);
             }
         }
 
-        [HttpDelete("Delete")]
-        public IActionResult Delete(int id)
+        [HttpGet("GetActorById")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetActorById(string id)
         {
-            if (id <= 0)
+            if (string.IsNullOrEmpty(id))
             {
-                return BadRequest("Id must be greater than 0");
+                return BadRequest("Id is invalid, must be greater than zero.");
             }
+            var result = await _movieService.GetActorById(id);
 
-            //_movieService.Delete(id);
-
-
-            return Ok();
+            if (result == null)
+            {
+                return NotFound($"Movie with {id} not found.");
+            }
+            return Ok(result);
         }
     }
 }

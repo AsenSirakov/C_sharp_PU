@@ -9,38 +9,45 @@ namespace MovieStore.BL.Services
         private readonly IMovieRepository _movieRepository;
         private readonly IActorRepository _actorRepository;
 
+        public Guid Id { get; set; }
+
         public MovieService(IMovieRepository movieRepository, IActorRepository actorRepository)
         {
             _movieRepository = movieRepository;
             _actorRepository = actorRepository;
+            Id = Guid.NewGuid();
         }
         
-        public List<Movie> GetAllMovies()
+        public async Task<List<Movie>> GetAllMovies()
         {
-            return _movieRepository.GetAllMovies();
+            var result = await _movieRepository.GetAllMovies();
+            return result;
         }
 
-        public void AddMovie(Movie? movie)
+        public async Task AddMovie(Movie movie)
         {
-            if (movie is null ) return;
-
-            foreach (var movieActor in movie.Actors)
-            {
-                var actor = _actorRepository.GetById(movieActor);
-
-                if (actor is null)
-                {
-                    throw new Exception(
-                        $"Actor with id {movieActor} does not exist");
-                }
-            }
-
-            _movieRepository.AddMovie(movie);
+            await _movieRepository.AddMovie(movie);
         }
 
-        public Movie? GetById(string id)
+        public async Task<Movie?> GetMovieById(string id)
         {
-            return _movieRepository.GetMovieById(id);
+            return await _movieRepository.GetMovieById(id);
+        }
+
+        public async Task DeleteMovie(string id)
+        {
+            await _movieRepository.DeleteMovie(id);
+        }
+
+        public async Task UpdateMovie(Movie movie)
+        {
+            await _movieRepository.UpdateMovie(movie);
+        }
+
+        public async Task<Actor?> GetActorById(string id)
+        {
+            var result =  await _actorRepository.GetActorById(id.ToString());
+            return result;
         }
     }
 }

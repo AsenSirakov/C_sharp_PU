@@ -20,9 +20,9 @@ internal class Program
 
     static async Task ProduceAsync(CancellationToken token)
     {
-        Console.WriteLine("🚀 Producer starting...");
+        Console.WriteLine(" Producer starting...");
         var producer = CreateProducer();
-        Console.WriteLine("✅ Producer created.");
+        Console.WriteLine("Producer created.");
 
         while (!token.IsCancellationRequested)
         {
@@ -42,11 +42,11 @@ internal class Program
             try
             {
                 var result = await producer.ProduceAsync("persons", msg, token);
-                Console.WriteLine($"📤 Sent: {person.Id} - {person.Name} to {result.TopicPartitionOffset}");
+                Console.WriteLine($" Sent: {person.Id} - {person.Name} to {result.TopicPartitionOffset}");
             }
             catch (ProduceException<string, Person> ex)
             {
-                Console.WriteLine($"❌ Produce failed: {ex.Error.Reason}");
+                Console.WriteLine($"Produce failed: {ex.Error.Reason}");
             }
 
             await Task.Delay(1000, token);
@@ -65,7 +65,7 @@ internal class Program
         {
             e.Cancel = true;
             cts.Cancel();
-            Console.WriteLine("🛑 Cancellation requested...");
+            Console.WriteLine("Cancellation requested...");
         };
 
         await Task.WhenAll(producerTask, consumerTask);
@@ -90,7 +90,7 @@ internal class ConsumerProgram
                 .Build();
 
             consumer.Subscribe("persons");
-            Console.WriteLine("👂 Consumer started. Listening...");
+            Console.WriteLine("Consumer started. Listening...");
 
             try
             {
@@ -102,12 +102,12 @@ internal class ConsumerProgram
 
                         if (result?.Message?.Value != null)
                         {
-                            Console.WriteLine($"✅ Received: {result.Message.Value.Name} ({result.Message.Value.Id})");
+                            Console.WriteLine($"Received: {result.Message.Value.Name} ({result.Message.Value.Id})");
                         }
                     }
                     catch (ConsumeException ex)
                     {
-                        Console.WriteLine($"❌ Consume error: {ex.Error.Reason}");
+                        Console.WriteLine($"Consume error: {ex.Error.Reason}");
                     }
                 }
             }
@@ -118,7 +118,7 @@ internal class ConsumerProgram
             finally
             {
                 consumer.Close();
-                Console.WriteLine("✅ Consumer closed.");
+                Console.WriteLine("Consumer closed.");
             }
         });
     }

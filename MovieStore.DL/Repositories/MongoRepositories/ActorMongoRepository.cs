@@ -1,43 +1,17 @@
-using Microsoft.Extensions.Options;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using MovieStore.DL.Interfaces;
-using MovieStore.Models.Configurations;
-using MovieStore.Models.DTO;
+﻿using MovieStoreB.DL.Interfaces;
+using MovieStoreB.Models.DTO;
 
-namespace MovieStore.DL.Repositories.MongoRepositories;
-
-public class ActorMongoRepository : IActorRepository
+namespace MovieStoreB.DL.Repositories.MongoRepositories
 {
-    private readonly IMongoCollection<Actor> _actorCollection;
-
-    public ActorMongoRepository(IOptionsMonitor<MongoDbConfiguration> mongoDbConfiguration)
+    internal class ActorMongoRepository : IActorRepository
     {
-        var client = new MongoClient(mongoDbConfiguration.CurrentValue.ConnectionString);
-        var database = client.GetDatabase(mongoDbConfiguration.CurrentValue.DatabaseName);
-        _actorCollection = database.GetCollection<Actor>($"{nameof(Actor)}s");
-    }
-
-    public async Task<Actor?> GetActorById(string actorId)
-    {
-        var result = await _actorCollection.FindAsync(actor => actor.Id == actorId);
-        return result.FirstOrDefault();
-    }
-
-    public async Task<List<Actor>> GetActorsById(IEnumerable<string> actorIds)
-    {
-        var result =  await _actorCollection.FindAsync(actor => actorIds.Contains(actor.Id));
-        return result.ToList();
-    }
-
-    public void AddActorToMovie(string actorId, Movie movie)
-    {
-        var actor = GetActorById(actorId);
-
-        if (actor != null)
+        public Actor? GetById(string id)
         {
-            movie.Actors.Add(actor.Id.ToString());
+            return new Actor
+            {
+                Id = id,
+                Name = "Test Actor"
+            };
         }
-        
     }
 }

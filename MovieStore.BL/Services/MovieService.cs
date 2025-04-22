@@ -1,53 +1,78 @@
-﻿using MovieStore.BL.Interfaces;
-using MovieStore.DL.Interfaces;
-using MovieStore.Models.DTO;
+﻿using MovieStoreB.BL.Interfaces;
+using MovieStoreB.DL.Interfaces;
+using MovieStoreB.Models.DTO;
 
-namespace MovieStore.BL.Services
+namespace MovieStoreB.BL.Services
 {
-    public class MovieService : IMovieService
+    internal class MovieService : IMovieService
     {
         private readonly IMovieRepository _movieRepository;
         private readonly IActorRepository _actorRepository;
-
-        public Guid Id { get; set; }
 
         public MovieService(IMovieRepository movieRepository, IActorRepository actorRepository)
         {
             _movieRepository = movieRepository;
             _actorRepository = actorRepository;
-            Id = Guid.NewGuid();
-        }
-        
-        public async Task<List<Movie>> GetAllMovies()
-        {
-            var result = await _movieRepository.GetAllMovies();
-            return result;
         }
 
-        public async Task AddMovie(Movie movie)
+        public List<Movie> GetMovies()
         {
-            await _movieRepository.AddMovie(movie);
+            return _movieRepository.GetMovies();
         }
 
-        public async Task<Movie?> GetMovieById(string id)
+        public void AddMovie(Movie movie)
         {
-            return await _movieRepository.GetMovieById(id);
+            if (movie == null || movie.ActorIds == null) return;
+
+            movie.DateInserted = DateTime.UtcNow;
+
+            foreach (var actor in movie.ActorIds)
+            {
+                if (!Guid.TryParse(actor, out _)) return;
+            }
+
+            _movieRepository.AddMovie(movie);
         }
 
-        public async Task DeleteMovie(string id)
+        public void DeleteMovie(string id)
         {
-            await _movieRepository.DeleteMovie(id);
+            if (!string.IsNullOrEmpty(id)) return;
+
+            _movieRepository.DeleteMovie(id);
         }
 
-        public async Task UpdateMovie(Movie movie)
+        public Movie? GetMoviesById(string id)
         {
-            await _movieRepository.UpdateMovie(movie);
+            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var movieId))
+            {
+                return null;
+            }
+
+            return _movieRepository.GetMoviesById(movieId.ToString());
         }
 
-        public async Task<Actor?> GetActorById(string id)
+        public void AddActor(string movieId, Actor actor) 
         {
-            var result =  await _actorRepository.GetActorById(id.ToString());
-            return result;
+            if (string.IsNullOrEmpty(movieId) || actor == null) return;
+
+            if (!Guid.TryParse(movieId, out _)) return;
+
+            var movie = _movieRepository.GetMoviesById(movieId);
+
+            if (movie == null) return;
+
+            if (movie.ActorIds == null)
+            {
+                movie.ActorIds = new List<string>();
+            }
+
+            if (actor.Id == null || string.IsNullOrEmpty(actor.Id) || Guid.TryParse(actor.Id, out _) == false) return;
+
+            var existingActor = _actorRepository.GetById(actor.Id);
+
+            if (existingActor != null) return;
+
+            movie.ActorIds.Add(actor.Id);
         }
     }
 }

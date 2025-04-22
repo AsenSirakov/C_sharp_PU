@@ -1,14 +1,18 @@
-﻿using MovieStore.Models.DTO;
+﻿
+using MovieStoreB.Models.DTO;
 
-namespace MovieStore.DL.Interfaces
+namespace MovieStoreB.DL.Interfaces
 {
     public interface IMovieRepository
     {
-        Task<List<Movie>> GetAllMovies();
-        Task AddMovie(Movie movie);
+        List<Movie> GetMovies();
 
-        Task<Movie?> GetMovieById(string id);
-        Task DeleteMovie(string id);
-        Task UpdateMovie(Movie movie);
+        void AddMovie(Movie movie);
+
+        void DeleteMovie(string id);
+
+        Movie? GetMoviesById(string id);
+
+        Task<IEnumerable<Movie?>> GetMoviesAfterDateTime(DateTime date);
     }
 }

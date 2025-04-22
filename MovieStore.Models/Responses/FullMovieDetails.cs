@@ -1,6 +1,8 @@
-﻿namespace MovieStoreB.Models.DTO
+﻿using MovieStoreB.Models.DTO;
+
+namespace MovieStoreB.Models.Responses
 {
-    public class Movie 
+    public class FullMovieDetails
     {
         public string Id { get; set; }
 
@@ -8,8 +10,8 @@
 
         public int Year { get; set; }
 
-        public List<string> ActorIds { get; set; }
-
         public DateTime DateInserted { get; set; }
+
+        public List<Actor> Actors { get; set; }
     }
 }

@@ -20,6 +20,7 @@ namespace MovieStoreB.DL
             //services.AddSingleton<ICacheRepository<Movie>, MoviesRepository>();
 
             services.AddCache<MoviesCacheConfiguration, MoviesRepository, Movie, string>(config);
+            services.AddCache<ActorsCacheConfiguration, ActorMongoRepository, Actor, string>(config);
 
             //services.AddHostedService<MongoCachePopulator<Movie, IMovieRepository>>();
 
@@ -45,11 +46,16 @@ namespace MovieStoreB.DL
             services.AddSingleton<IKafkaProducer<TData>, KafkaProducer<TKey, TData>>();
             services.AddHostedService<MongoCachePopulator<TData, ICacheRepository<TData>, TCacheConfiguration, TKey>>();
 
+
             return services;
         }
     }
 
     public class MoviesCacheConfiguration : CacheConfiguration
+    {
+    }
+
+    public class ActorsCacheConfiguration : CacheConfiguration
     {
     }
 

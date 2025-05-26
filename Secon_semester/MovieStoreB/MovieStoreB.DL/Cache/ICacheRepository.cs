@@ -1,11 +1,9 @@
-﻿using MovieStoreB.Models.DTO;
-
-namespace MovieStoreB.DL.Cache
+﻿namespace MovieStoreB.DL.Cache
 {
-    public interface ICacheRepository<TKey, TData> where TData : ICacheItem<TKey>
+    public interface ICacheRepository<T> where T : class
     {
-        Task<IEnumerable<TData?>> FullLoad();
+        Task<IEnumerable<T?>> FullLoad();
 
-        Task<IEnumerable<TData?>> DifLoad(DateTime lastExecuted);
+        Task<IEnumerable<T?>> DifLoad(DateTime lastExecuted);
     }
 }

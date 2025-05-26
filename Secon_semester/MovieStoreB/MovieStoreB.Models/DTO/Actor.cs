@@ -1,11 +1,8 @@
-﻿
-namespace MovieStoreB.Models.DTO
+﻿namespace MovieStoreB.Models.DTO
 {
     public record Actor(string Id, string Name) : ICacheItem<string>
     {
-        public DateTime DateInserted { get; set; }
-
-        public string GetKey()
+        public override string GetKey()
         {
             return Id;
         }

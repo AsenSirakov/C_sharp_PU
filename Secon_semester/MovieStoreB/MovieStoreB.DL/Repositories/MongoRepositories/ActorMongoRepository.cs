@@ -28,8 +28,6 @@ namespace MovieStoreB.DL.Repositories.MongoRepositories
 
             _actorsCollection = database.GetCollection<Actor>($"{nameof(Actor)}s");
         }
-
-
         public async Task<IEnumerable<Actor?>> DifLoad(DateTime lastExecuted)
         {
             var result = await _actorsCollection.FindAsync(m => m.DateInserted >= lastExecuted);
@@ -39,14 +37,14 @@ namespace MovieStoreB.DL.Repositories.MongoRepositories
 
         public async Task<IEnumerable<Actor?>> FullLoad()
         {
-            return await GetAllActors();
-        }
-
-        public async Task<IEnumerable<Actor?>> GetAllActors()
-        {
             var result = await _actorsCollection.FindAsync(m => true);
 
             return await result.ToListAsync();
+        }
+
+        public Task<IEnumerable<Actor>> GetAllActors()
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<Actor?> GetById(string id)
